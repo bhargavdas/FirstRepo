@@ -185,8 +185,6 @@ umount_partition()
 {
     cd ~
     disk_device=$1
-    #added
-    umount /dev/${disk_device}
     if [ -z "$2" ]; then
         i=1
         while [ $i -lt 5 ]; do
@@ -1339,21 +1337,30 @@ test_case_04()
     #TODO give TST_COUNT
     TST_COUNT=4
     RC=4
-
+   
     if [ -n "$tf_env" ];then
         check_cdc_device "mouse" || exit $RC
     fi
-    inputNo=`ls -l /sys/class/input/ | grep -m 1 usb | cut -d '/' -f 14`
+    #inputNo=`ls -l /sys/class/input/ | grep -m 1 usb | cut -d '/' -f 14`
+    inputNo=`ls -l /sys/class/input/ | grep -m 1 usb | awk -F "/" '{print $(NF-1)}'`
     evNo=`find /sys/class/input/$inputNo/ -name "event*" | cut -d '/' -f 6`
 
     if [ -n "$evNo" ];then
-        usb_ev_testapp /dev/input/$evNo > /tmp/usb.log &
+        #usb_ev_testapp /dev/input/$evNo > /tmp/usb.log &
+	
+	# Replaced 'usb_ev_testapp' function with 'evtest' command
+	# Used 'tee' command to redirect log
+        evtest /dev/input/$evNo | tee /tmp/usb.log &
         usbpid=$!
         sleep 2
         kill $usbpid
 
         mouse_parm=$(cat /tmp/usb.log | sed -n -e '3p' | cut -d: -f2 | sed 's/"//g' | sed 's/ //g')
-        if [ $mouse_parm = "FREESCALESEMICONDUCTORINC.HID_CDCDEVICE" ];then
+
+	# To make the testcase generic grepping the mouse keyword from the device name
+	cat /tmp/usb.log | sed -n -e '3p' | cut -d: -f2 | sed 's/"//g' | sed 's/ //g' | grep -i mouse 
+	mouse_parm_all=$?
+        if [ $mouse_parm = "FREESCALESEMICONDUCTORINC.HID_CDCDEVICE" ] || [ $mouse_parm_all -eq 0 ];then
             RC=0
         else
             echo "usb mouse event failed"
