@@ -9,7 +9,7 @@ check_usb(){
     pre_conn_num=${#pre_conn[@]}
 
     #connect usb storage device using Acroname
-    sshpass -p $1 ssh $2@$3 python $4 control $5 && sleep 4
+    sshpass -p $1 ssh $2@$3 -y python $4 control $5 && sleep 4
 
     declare -a post_conn
     post_conn=(`ls /sys/bus/usb/devices`)
@@ -18,6 +18,7 @@ check_usb(){
     if [ $pre_conn_num -eq $post_conn_num ]; then 
         echo "usb device not connected"
         RC=1
+        exit 1
     else
         echo "usb device connected"
         RC=0
@@ -27,13 +28,14 @@ check_usb(){
     ls /sys/bus/usb/devices
 
     #disconnect usb device
-    sshpass -p $1 ssh $2@$3 python $4 disable && sleep 4
+    sshpass -p $1 ssh $2@$3 -y python $4 disable && sleep 4
 
     dis_conn=(`ls /sys/bus/usb/devices`)
     dis_conn_num=${#dis_conn[@]}
     if [ $pre_conn_num -ne $dis_conn_num ]; then 
         echo "usb device not disconnected"
         RC=2
+        exit 2
     else
         echo "usb device disconnected successfully"
         RC=0
@@ -55,6 +57,9 @@ RC=0
 if [ $# -ne 6 ]; then 
     usage
 fi
+
+#disconnect all usb devices
+sshpass -p $1 ssh $2@$3 -y python $4 disable && sleep 4
 
 for loop in $(seq 1 $6);do
     echo "Checking usb connect and disconnect $loop time(s)"
