@@ -1286,6 +1286,9 @@ test_case_03()
     TST_COUNT=3
     RC=3
 
+    #connect acroname
+    acroname_operation connect
+
     disk_node=$(check_usb_device "disk")
     #delete duplicated device node
     disk_node=`echo "$disk_node" | sort | uniq`
@@ -1331,6 +1334,9 @@ test_case_03()
     if [ "$?" -eq 0 ];then
         RC=0
     fi
+
+    #disconnect acroname
+    acroname_operation disconnect
 
     return $RC
 }
