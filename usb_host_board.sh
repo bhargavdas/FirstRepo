@@ -1239,6 +1239,9 @@ test_case_02()
     TST_COUNT=2
     RC=0
 
+    #connect acroname
+    acroname_operation connect
+
     disk_node=$(check_usb_device "disk")
     #delete duplicated device node
     disk_node=`echo "$disk_node" | sort | uniq`
@@ -1266,6 +1269,10 @@ test_case_02()
         echo "Auto create disk partition failed, please creat a partition for $disk_node"
         RC=1
     fi
+
+    #disconnect acroname
+    acroname_operation disconnect
+
     return $RC
 }
 
@@ -1420,10 +1427,23 @@ test_case_05()
     return $RC
 }
 
+acroname_operation()
+{
+    case $1 in
+        connect)
+            sshpass -p $host_pass ssh $host_username@$host_ip -y python $acro_scpt_loc control $arco_channel && sleep 4 || RC=100
+            ;;
+        disconnect)
+            sshpass -p $host_pass ssh $host_username@$host_ip -y python $acro_scpt_loc disable && sleep 4 || RC=101
+            ;;
+    esac
+}
+
 usage()
 {
     echo
-    echo "$0 <CASE ID> "
+#    echo "$0 <CASE ID> "
+    echo "$0 <host password> <host username> <host ip addr> <location of Acromame script location in host> <Channel of device conencted to Acroname> <CASE ID> "
     echo "CASE LIST:"
     echo "  HOST3001a  HOST3005a  HOST3006a"
     echo "  HDS001a     LOADABLE0010a   LOADABLE0014a"
@@ -1437,13 +1457,15 @@ usage()
     echo "  usb_host_board.sh HOST3005a"
     echo
     echo "As a tool : use it to check usb device"
-    echo "$0 check_usb_device <USB Category>"
+#    echo "$0 check_usb_device <USB Category>"
+    echo "$0 <host password> <host username> <host ip addr> <location of Acromame script location in host> <Channel of device conencted to Acroname> check_usb_device <USB Category>"
     echo "USB Category:"
     echo "  disk | mouse | microphone"
     echo "  loudspeaker | camera | keyboard"
     echo
     echo "Example:"
-    echo "  usb_host_board.sh check_usb_device camera"
+#    echo "  usb_host_board.sh check_usb_device camera"
+    echo "  usb_host_board.sh <host password> <host username> <host ip addr> <location of Acromame script location in host> <Channel of device conencted to Acroname> check_usb_device camera"
     echo
     exit 1
 }
@@ -1451,10 +1473,18 @@ usage()
  #main function
  export TST_TOTAL=8
  RC=0
- if [ $# -ne 1 -a $# -ne 2 ]
+ #if [ $# -ne 1 -a $# -ne 2 ]
+ if [ $# -ne 6 -a $# -ne 7 ]
  then
      usage
  fi
+
+ #acroname params
+ host_pass=$1
+ host_username=$2
+ host_ip=$3
+ acro_scpt_loc=$4
+ arco_channel=$5
 
  setup || exit $RC
 
@@ -1464,15 +1494,18 @@ usage()
  fi
 
  SPEED="480"
- if [ "$2" = "SS" ]; then
+# if [ "$2" = "SS" ]; then
+ if [ "$7" = "SS" ]; then
      SPEED="5000"
  fi
 
- case "$1" in
+ #case "$1" in
+ case "$6" in
      HOST3001a|HOST3005a|HOST3006a| \
          HDS001a|LOADABLE0010a|LOADABLE0014a |\
          LOADABLE0010c)
-     $1 || exit $RC
+#     $1 || exit $RC
+     $6 || exit $RC
               ;;
      LOADABLE0014c)
          LOADABLE0010c || exit $RC
@@ -1481,6 +1514,7 @@ usage()
          DVFS0001 || exit $RC
          ;;
      check_usb_device)
+#         $1 $2 || exit $RC
          $1 $2 || exit $RC
          ;;
      1)
@@ -1503,7 +1537,8 @@ usage()
          ;;
 esac
 
-if [ $# -eq 1 ]; then
+#if [ $# -eq 1 ]; then
+if [ $# -eq 6 ]; then
     if [ $RC -eq 0 ]; then
         tst_resm TPASS "test PASS"
     else
