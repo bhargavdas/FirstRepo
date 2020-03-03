@@ -519,6 +519,9 @@ HOST3001a()
     echo "=============================="
     echo "=     start $TCID      ="
 
+    #connect acroname
+    acroname_operation connect
+
     camera_node=$(check_usb_device "camera")
 
     if [ -z "$camera_node" ]; then
@@ -552,6 +555,10 @@ HOST3001a()
     `find /unit_tests/ -name mxc_v4l2_capture.out | sort -n | sed -n '1p'` -uvc -f YUYV -d /dev/$camera_node -ow 320 -oh 240 -c 1000 $tmp_file.yuv || RC=44
     # we don't use the vooya tool to watch the capture
     rm -rf $tmp_file.yuv
+
+    #disconnect acroname
+    acroname_operation disconnect
+    
     return $RC
 }
 
