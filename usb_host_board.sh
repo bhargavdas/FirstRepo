@@ -558,7 +558,7 @@ HOST3001a()
 
     #disconnect acroname
     acroname_operation disconnect
-    
+
     return $RC
 }
 
@@ -573,6 +573,10 @@ HOST3005a()
     TCID="HOST3005a"
     echo "=============================="
     echo "=     start $TCID      ="
+
+    #connect acroname
+    acroname_operation connect
+
     #make sure snd-usb-audio.ko in build in module
     modprobe -a snd-usb-audio >/dev/null 2>&1
     sleep 5
@@ -622,6 +626,10 @@ HOST3005a()
 
     modprobe -a -r snd-usb-audio >/dev/null 2>&1
     sleep 10
+
+    #disconnect acroname
+    acroname_operation disconnect
+
     return $RC
 }
 
@@ -637,6 +645,10 @@ HOST3006a()
     TCID="HOST3006a"
     echo "=============================="
     echo "=     start $TCID      ="
+
+    #connect acroname
+    acroname_operation connect
+
     #make sure snd-usb-audio.ko in build in module
     modprobe -a snd-usb-audio >/dev/null 2>&1
     sleep 5
@@ -690,6 +702,10 @@ HOST3006a()
     rm -rf /dev/tmpfile.wav
     modprobe -a -r snd-usb-audio >/dev/null 2>&1
     sleep 2
+
+    #disconnect acroname
+    acroname_operation disconnect
+
     return $RC
 }
 
@@ -872,9 +888,9 @@ HDS001a()
     done
     umount $mount_dir
 
-    #connect acroname
-    acroname_operation connect
-     return $RC
+    #disconnect acroname
+    acroname_operation disconnect
+    return $RC
 }
 
 ###########################################################################
