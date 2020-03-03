@@ -698,6 +698,10 @@ DVFS0001()
 {
     RC=0
     TCID="DVFS0001"
+
+    #connect acroname
+    acroname_operation connect
+
     echo "=============================="
     echo "=     start $TCID      ="
 
@@ -768,6 +772,10 @@ DVFS0001()
 
     umount_partition ${disk_node}
     echo ${pre_gov} > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+
+    #disconnect acroname
+    acroname_operation disconnect
+
     return $RC
 }
 
@@ -781,6 +789,10 @@ DVFS0001()
 HDS001a()
 {
     RC=0
+
+    #connect acroname
+    acroname_operation connect
+
     TCID="HDS001a"
     echo "=============================="
     echo "=     start $TCID      ="
@@ -828,7 +840,8 @@ HDS001a()
             modprobe -a g_mass_storage file=/var/storage.img removable=1
         fi
         #make sure host can still recognize the usb device
-        get_scsi.sh 4
+        #get_scsi.sh 4
+        get_scsi.sh $host_pass $host_username $host_ip $acro_scpt_loc $arco_channel 4
         if [ $? -ne 0 ]; then
            echo "USB Host can't recognize u-disk after loading gadget driver. Test Fail!"
            RC=9
@@ -841,7 +854,8 @@ HDS001a()
             modprobe -a -r g_mass_storage
         fi
         #make sure host can still recognize the usb device
-        get_scsi.sh 4
+        #get_scsi.sh 4
+        get_scsi.sh $host_pass $host_username $host_ip $acro_scpt_loc $arco_channel 4
         if [ $? -ne 0 ]; then
            echo "USB Host can't recognize u-disk after loading gadget driver. Test Fail!"
            RC=9
@@ -849,7 +863,10 @@ HDS001a()
         let ri=ri+1
         echo $ri
     done
-     umount $mount_dir
+    umount $mount_dir
+
+    #connect acroname
+    acroname_operation connect
      return $RC
 }
 
@@ -1350,6 +1367,10 @@ test_case_04()
     #TODO give TST_COUNT
     TST_COUNT=4
     RC=4
+
+    #connect acroname
+    acroname_operation connect
+
    
     if [ -n "$tf_env" ];then
         check_cdc_device "mouse" || exit $RC
@@ -1380,6 +1401,9 @@ test_case_04()
             RC=4
         fi
     fi
+
+    #disconnect acroname
+    acroname_operation disconnect
 
     return $RC
 }
