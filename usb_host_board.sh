@@ -1241,9 +1241,6 @@ LOADABLE0010c()
     echo "--------------------------------------------------"
     sleep 10
 
-    #connect acroname
-    acroname_operation connect
-
     echo "=============================="
     echo "=     start $TCID      ="
 
@@ -1253,20 +1250,31 @@ LOADABLE0010c()
     modprobe -a $phy && modprobe -a $core_driver
     sleep 5
 
+    #disconnect acroname
+    acroname_operation disconnect
+
     i=1
     while [ $i -lt 6 ]
     do
+        #disconnect acroname
+        acroname_operation disconnect
         echo "testing $i times usb mouse plugin/plugout"
-        if [ -c /dev/$k64_port ];then
-            echo 5 > /dev/$k64_port
-            sleep 5
-            de_init_cnt=$(ls -l /sys/class/input/ | grep -m 1 usb | wc -l)
-        else
-            echo "It seems TWR-K64 image or hub broken"
-            RC=9
-            return $RC
-        fi
-        sleep 60
+        #if [ -c /dev/$k64_port ];then
+        #    echo 5 > /dev/$k64_port
+        #    sleep 5
+        #    de_init_cnt=$(ls -l /sys/class/input/ | grep -m 1 usb | wc -l)
+        #else
+        #    echo "It seems TWR-K64 image or hub broken"
+        #    RC=9
+        #    return $RC
+        #fi
+        #sleep 60
+
+        de_init_cnt=$(ls -l /sys/class/input/ | grep -m 1 usb | wc -l)
+        sleep 6
+        #connect acroname
+        acroname_operation connect
+
         init_cnt=$(ls -l /sys/class/input/ | grep -m 1 usb | wc -l)
         if [ $de_init_cnt -lt $init_cnt ];then
             echo "usb mouse plugin/plugout normal"
@@ -1547,7 +1555,7 @@ usage()
 {
     echo
 #    echo "$0 <CASE ID> "
-    echo "$0 <host password> <host username> <host ip addr> <location of Acromame script location in host> <Channel of device conencted to Acroname> <CASE ID> "
+    echo "$0 <host password> <host username> <host ip addr> <Acromame script location in host> <Channel of device conencted to Acroname> <CASE ID> "
     echo "CASE LIST:"
     echo "  HOST3001a  HOST3005a  HOST3006a"
     echo "  HDS001a     LOADABLE0010a   LOADABLE0014a"
@@ -1562,14 +1570,14 @@ usage()
     echo
     echo "As a tool : use it to check usb device"
 #    echo "$0 check_usb_device <USB Category>"
-    echo "$0 <host password> <host username> <host ip addr> <location of Acromame script location in host> <Channel of device conencted to Acroname> check_usb_device <USB Category>"
+    echo "$0 <host password> <host username> <host ip addr> <Acromame script location in host> <Channel of device conencted to Acroname> check_usb_device <USB Category>"
     echo "USB Category:"
     echo "  disk | mouse | microphone"
     echo "  loudspeaker | camera | keyboard"
     echo
     echo "Example:"
 #    echo "  usb_host_board.sh check_usb_device camera"
-    echo "  usb_host_board.sh <host password> <host username> <host ip addr> <location of Acromame script location in host> <Channel of device conencted to Acroname> check_usb_device camera"
+    echo "  usb_host_board.sh <host password> <host username> <host ip addr> <Acromame script location in host> <Channel of device conencted to Acroname> check_usb_device camera"
     echo
     exit 1
 }

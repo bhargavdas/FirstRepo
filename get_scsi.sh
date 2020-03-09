@@ -196,7 +196,7 @@ usage()
     cat <<-EOF
 
 Get scsi devices name for ata or usb:
-`basename $0` <host password> <host username> <host ip addr> <location of Acromame script location in host> <Channel of device conencted to Acroname> <case ID> [speed mode]
+`basename $0` <host password> <host username> <host ip addr> <Acromame script location in host> <Channel of device conencted to Acroname> <case ID> [speed mode]
     1: Get the first ata device name
     2: Get all ata devices name
     3: Get the first usb scsi device name for the give speed mode. 
