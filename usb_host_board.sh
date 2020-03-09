@@ -910,9 +910,12 @@ LOADABLE0010a()
     echo "Reminder: This case need use special kernel"
 
     sleep 10
+
+    #connect acroname
+    acroname_operation connect
+
     echo "=============================="
     echo "=     start $TCID      ="
-
 
     disk_node=$(check_usb_device "disk")
     #delete duplicated device node
@@ -947,10 +950,12 @@ LOADABLE0010a()
     umount_partition ${disk_node}
     modprobe -a -r $core_driver; modprobe -a -r $phy
     sleep 5
+
     si=0
-    while [ $si -lt 20 ]
+    #while [ $si -lt 20 ]
+    while [ $si -lt 2 ]
     do
-        modprobe -a $phy && modprobe -a $core_driver && sleep 5 && get_scsi.sh 4 || { RC=22; break; }
+        modprobe -a $phy && modprobe -a $core_driver && sleep 5 && get_scsi.sh $host_pass $host_username $host_ip $acro_scpt_loc $arco_channel 4 || { RC=22; break; }
         umount_partition ${disk_node}
         modprobe -a -r $core_driver && modprobe -a -r $phy || { RC=22; break; }
         let si=si+1
@@ -965,22 +970,36 @@ LOADABLE0010a()
     #step 4
     modprobe -a $phy && modprobe -a $core_driver
 
+    #connect acroname
+    acroname_operation connect
+
     sleep 5
     umount_partition ${disk_node}
     umount /mnt/sdx
+
+    #disconnect acroname
+    acroname_operation disconnect
+
     si=0
-    while [ $si -lt 20 ]
+    #while [ $si -lt 20 ]
+    while [ $si -lt 2 ]
     do
-        modprobe -a $phy && modprobe -a $core_driver && sleep 5 && get_scsi.sh 4 && \
+        modprobe -a $phy && modprobe -a $core_driver && sleep 5 && get_scsi.sh $host_pass $host_username $host_ip $acro_scpt_loc $arco_channel 4 && \
             umount_partition ${disk_node}; \
          modprobe -a -r $core_driver && modprobe -a -r $phy && let si=si+1 || {  RC=22; break; }
         echo $si
     done
+
     #load the USB driver back again
     modprobe -a $phy && modprobe -a $core_driver
+
+    #connect acroname
+    acroname_operation connect
+
     sleep 6
     umount_partition ${disk_node}
     umount /mnt/sdx
+
     mkdir -p /mnt/sdx && mount /dev/$disk_partion /mnt/sdx|| \
         { mkfs.vfat /dev/$disk_partion ;mount /dev/$disk_partion /mnt/sdx; }
     mount_dir=$(mount | grep $disk_partion | awk '{print $3}')
@@ -1038,6 +1057,10 @@ LOADABLE0010a()
          fi
      fi
      sleep 3
+
+    #disconnect acroname
+    acroname_operation disconnect
+
      return $RC
 }
 
@@ -1060,6 +1083,10 @@ LOADABLE0014a()
     sleep 10
     echo "=============================="
     echo "=     start $TCID      ="
+    
+    #connect acroname
+    acroname_operation connect
+    
     modprobe -a $phy && modprobe -a $core_driver
     disk_node=$(check_usb_device "disk")
     #delete duplicated device node
@@ -1094,10 +1121,18 @@ LOADABLE0014a()
     umount_partition ${disk_node}
     modprobe -a -r $core_driver; modprobe -a -r $phy
     sleep 5
+
+    #disconnect acroname
+    acroname_operation disconnect
+
     si=0
+
+    #connect acroname
+    acroname_operation connect
+
     while [ $si -lt 20 ]
     do
-        modprobe -a $phy && modprobe -a $core_driver && sleep 3 && get_scsi.sh 4 && \
+        modprobe -a $phy && modprobe -a $core_driver && sleep 3 && get_scsi.sh $host_pass $host_username $host_ip $acro_scpt_loc $arco_channel 4 && \
             umount_partition ${disk_node}; \
          modprobe -a -r $core_driver && modprobe -a -r $phy && let si=si+1 || {  RC=22; break; }
         echo $si
@@ -1109,6 +1144,10 @@ LOADABLE0014a()
     fi
 
     #step 4
+
+    #connect acroname
+    acroname_operation connect
+
     modprobe -a $phy && modprobe -a $core_driver
     sleep 5
     umount_partition ${disk_node}
@@ -1156,7 +1195,7 @@ LOADABLE0014a()
         fi
         #make sure host can still recognize the usb device
         #new_disk_node=$(check_usb_device "disk" "no")
-        get_scsi.sh 4
+        get_scsi.sh $host_pass $host_username $host_ip $acro_scpt_loc $arco_channel 4
         if [ $? -ne 0 ]; then
            echo "USB Host can't recognize u-disk after loading gadget driver. Test Fail!"
            RC=9
@@ -1167,7 +1206,7 @@ LOADABLE0014a()
         else
             modprobe -a -r g_mass_storage
         fi
-        get_scsi.sh 4
+        get_scsi.sh $host_pass $host_username $host_ip $acro_scpt_loc $arco_channel 4
         if [ $? -ne 0 ]; then
            echo "USB Host can't recognize u-disk after unloading gadget driver. Test Fail!"
            RC=9
@@ -1179,6 +1218,10 @@ LOADABLE0014a()
     umount_partition ${disk_node}
     modprobe -a -r $core_driver; modprobe -a -r $phy
     sleep 3
+
+    #disconnect acroname
+    acroname_operation disconnect
+
     return $RC
 }
 
@@ -1197,6 +1240,10 @@ LOADABLE0010c()
     echo "Reminder: This case need use special kernel and dtb"
     echo "--------------------------------------------------"
     sleep 10
+
+    #connect acroname
+    acroname_operation connect
+
     echo "=============================="
     echo "=     start $TCID      ="
 
@@ -1234,6 +1281,10 @@ LOADABLE0010c()
 
     modprobe -a -r $core_driver; modprobe -a -r $phy
     sleep 5
+
+    #disconnect acroname
+    acroname_operation disconnect
+
     return $RC
 }
 
